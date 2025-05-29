@@ -12,14 +12,14 @@ async function bootstrap() {
     }),
   );
   const config = new DocumentBuilder()
-    .setTitle('Sigma Api')
-    .setDescription('очень много действий с задачами (4)')
-    .setVersion('0.000000000000001')
+    .setTitle('Todo Api')
+    .setDescription('ToDo Api')
+    .setVersion('0.0.1')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('docs', app, document);
 
   await app.listen(process.env.PORT ?? 3000);
 }
