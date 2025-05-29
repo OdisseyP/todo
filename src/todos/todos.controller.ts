@@ -18,7 +18,7 @@ export class TodosController {
   constructor(private readonly todoService: TodosService) {}
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Todo | undefined {
+  findOne(@Param('id', ParseIntPipe) id: number): Todo {
     return this.todoService.findOne(id);
   }
 

@@ -33,7 +33,7 @@ export class TodosService {
     return todo;
   }
 
-  update(id: number, dto: UpdateTodoDto): Todo | undefined {
+  update(id: number, dto: UpdateTodoDto): Todo {
     const idx = this.todos.findIndex((t) => t.id === id);
 
     if (idx === -1) {
