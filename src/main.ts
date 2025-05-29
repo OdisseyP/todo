@@ -28,8 +28,8 @@ async function bootstrap() {
 
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(port);
-  console.log(`Сервер успешно запустился на порте ${port}`);
+  await app.listen(port ?? 3000);
+  console.log(`Nest Application launched at http://localhost:${port}`);
 }
 
 bootstrap();
