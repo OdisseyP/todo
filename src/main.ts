@@ -11,6 +11,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
   const config = new DocumentBuilder()
     .setTitle('Todo Api')
     .setDescription('ToDo Api')
