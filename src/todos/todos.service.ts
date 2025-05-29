@@ -11,7 +11,7 @@ export class TodosService {
     return this.todos;
   }
 
-  findOne(id: number): Todo | undefined {
+  findOne(id: number): Todo {
     const todo = this.todos.find((t) => t.id === id);
 
     if (!todo) {
