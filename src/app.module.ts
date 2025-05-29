@@ -5,6 +5,7 @@ import { TodosModule } from './todos/todos.module';
 import { TodosService } from './todos/todos.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmConfigService } from './configs/typeorm-config.service';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -12,11 +13,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       envFilePath: '.env',
     }),
 
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: TypeOrmConfigService,
     }),
 
     TodosModule,
