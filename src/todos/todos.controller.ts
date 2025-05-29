@@ -1,11 +1,8 @@
-// src/todos/todos.controller.ts
-
 import {
   Controller,
   Get,
   Param,
   ParseIntPipe,
-  NotFoundException,
   Patch,
   Body,
   Delete,
@@ -21,32 +18,21 @@ export class TodosController {
   constructor(private readonly svc: TodosService) {}
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Todo {
-    const todo = this.svc.findOne(id);
-    if (!todo) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
-    return todo;
+  findOne(@Param('id', ParseIntPipe) id: number): Todo | undefined {
+    return this.svc.findOne(id);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTodoDto,
-  ): Todo {
-    const updated = this.svc.update(id, dto);
-    if (!updated) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
-    return updated;
+  ): Todo | undefined {
+    return this.svc.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): void {
-    const success = this.svc.remove(id);
-    if (!success) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
+  remove(@Param('id', ParseIntPipe) id: number): boolean {
+    return this.svc.remove(id);
   }
 
   @Post()
