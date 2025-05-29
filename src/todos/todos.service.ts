@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Todo } from './todo.interface';
 import { CreateTodoDto } from './dto/create-todo-dto';
 import { UpdateTodoDto } from './dto/update-todo-dto';
@@ -11,9 +10,17 @@ export class TodosService {
   findAll(): Todo[] {
     return this.todos;
   }
-  findOne(id: number): Todo | undefined {
-    return this.todos.find((t) => t.id === id);
+
+  findOne(id: number): Todo {
+    const todo = this.todos.find((t) => t.id === id);
+
+    if (!todo) {
+      throw new NotFoundException(`Not found ${id}`);
+    }
+
+    return todo;
   }
+
   create(dto: CreateTodoDto): Todo {
     const todo: Todo = {
       id: Date.now(),
@@ -26,17 +33,26 @@ export class TodosService {
     return todo;
   }
 
-  update(id: number, dto: UpdateTodoDto): Todo | undefined {
+  update(id: number, dto: UpdateTodoDto): Todo {
     const idx = this.todos.findIndex((t) => t.id === id);
-    if (idx === -1) return undefined;
+
+    if (idx === -1) {
+      throw new NotFoundException(`Not found ${id}`);
+    }
+
     this.todos[idx] = { ...this.todos[idx], ...dto };
 
     return this.todos[idx];
   }
 
   remove(id: number): boolean {
-    const lenBefore = this.todos.length;
+    const initialLength = this.todos.length;
     this.todos = this.todos.filter((t) => t.id !== id);
-    return this.todos.length < lenBefore;
+
+    if (this.todos.length === initialLength) {
+      throw new NotFoundException(`Not found ${id}`);
+    }
+
+    return true;
   }
 }

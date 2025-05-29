@@ -1,11 +1,8 @@
-// src/todos/todos.controller.ts
-
 import {
   Controller,
   Get,
   Param,
   ParseIntPipe,
-  NotFoundException,
   Patch,
   Body,
   Delete,
@@ -18,44 +15,33 @@ import { Todo } from './todo.interface';
 
 @Controller('todos')
 export class TodosController {
-  constructor(private readonly svc: TodosService) {}
+  constructor(private readonly todoService: TodosService) {}
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Todo {
-    const todo = this.svc.findOne(id);
-    if (!todo) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
-    return todo;
+    return this.todoService.findOne(id);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTodoDto,
-  ): Todo {
-    const updated = this.svc.update(id, dto);
-    if (!updated) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
-    return updated;
+  ): Todo | undefined {
+    return this.todoService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number): void {
-    const success = this.svc.remove(id);
-    if (!success) {
-      throw new NotFoundException(`Todo with id ${id} not found`);
-    }
+  remove(@Param('id', ParseIntPipe) id: number): boolean {
+    return this.todoService.remove(id);
   }
 
   @Post()
   create(@Body() dto: CreateTodoDto): Todo {
-    return this.svc.create(dto);
+    return this.todoService.create(dto);
   }
 
   @Get()
   findAll(): Todo[] {
-    return this.svc.findAll();
+    return this.todoService.findAll();
   }
 }
