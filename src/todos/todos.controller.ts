@@ -15,11 +15,11 @@ import { Todo } from './todo.interface';
 
 @Controller('todos')
 export class TodosController {
-  constructor(private readonly svc: TodosService) {}
+  constructor(private readonly todoService: TodosService) {}
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Todo | undefined {
-    return this.svc.findOne(id);
+    return this.todoService.findOne(id);
   }
 
   @Patch(':id')
@@ -27,21 +27,21 @@ export class TodosController {
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateTodoDto,
   ): Todo | undefined {
-    return this.svc.update(id, dto);
+    return this.todoService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): boolean {
-    return this.svc.remove(id);
+    return this.todoService.remove(id);
   }
 
   @Post()
   create(@Body() dto: CreateTodoDto): Todo {
-    return this.svc.create(dto);
+    return this.todoService.create(dto);
   }
 
   @Get()
   findAll(): Todo[] {
-    return this.svc.findAll();
+    return this.todoService.findAll();
   }
 }

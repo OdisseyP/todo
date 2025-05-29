@@ -14,7 +14,7 @@ export class TodosService {
   findOne(id: number): Todo | undefined {
     const todo = this.todos.find((t) => t.id === id);
 
-    if (todo!) {
+    if (!todo) {
       throw new NotFoundException(`Not found ${id}`);
     }
 
@@ -46,10 +46,10 @@ export class TodosService {
   }
 
   remove(id: number): boolean {
-    const initial = this.todos.length;
+    const initialLength = this.todos.length;
     this.todos = this.todos.filter((t) => t.id !== id);
 
-    if (this.todos.length === initial) {
+    if (this.todos.length === initialLength) {
       throw new NotFoundException(`Not found ${id}`);
     }
 
