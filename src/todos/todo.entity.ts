@@ -1,3 +1,13 @@
-import { TodoEntity } from './entities/todos-entities';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-export const todosEntities = [TodoEntity];
+@Entity('todos')
+export class TodoEntity {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;
+
+  @Column({ default: false })
+  done: boolean;
+}
