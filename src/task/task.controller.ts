@@ -9,10 +9,10 @@ import {
   Post,
   HttpCode,
 } from '@nestjs/common';
-import { TodosService } from './todos.service';
-import { CreateTodoDto } from './dto/create-todo-dto';
-import { UpdateTodoDto } from './dto/update-todo-dto';
-import { TodoEntity } from './todo.entity';
+import { TaskService } from './task.service';
+import { CreateTaskDto } from './dto/create-task-dto';
+import { UpdateTaskDto } from './dto/update-task-dto';
+import { TaskEntity } from './task.entity';
 
 import {
   ApiTags,
@@ -24,43 +24,43 @@ import {
 
 @ApiTags('todos')
 @Controller('todos')
-export class TodosController {
-  constructor(private readonly todoService: TodosService) {}
+export class TaskController {
+  constructor(private readonly todoService: TaskService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get tasks' })
-  @ApiResponse({ status: 200, type: [TodoEntity] })
-  findAll(): Promise<TodoEntity[]> {
+  @ApiResponse({ status: 200, type: [TaskEntity] })
+  findAll(): Promise<TaskEntity[]> {
     return this.todoService.findAll();
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get task from ID' })
   @ApiParam({ name: 'id', example: 1 })
-  @ApiResponse({ status: 200, type: TodoEntity })
+  @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<TodoEntity> {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<TaskEntity> {
     return this.todoService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create task' })
-  @ApiBody({ type: CreateTodoDto })
-  @ApiResponse({ status: 201, type: TodoEntity })
-  create(@Body() dto: CreateTodoDto): Promise<TodoEntity> {
+  @ApiBody({ type: CreateTaskDto })
+  @ApiResponse({ status: 201, type: TaskEntity })
+  create(@Body() dto: CreateTaskDto): Promise<TaskEntity> {
     return this.todoService.create(dto);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Refresh task' })
   @ApiParam({ name: 'id', example: 1 })
-  @ApiBody({ type: UpdateTodoDto })
-  @ApiResponse({ status: 200, type: TodoEntity })
+  @ApiBody({ type: UpdateTaskDto })
+  @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateTodoDto,
-  ): Promise<TodoEntity> {
+    @Body() dto: UpdateTaskDto,
+  ): Promise<TaskEntity> {
     return this.todoService.update(id, dto);
   }
 

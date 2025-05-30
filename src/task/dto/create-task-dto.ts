@@ -1,17 +1,14 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsOptional, IsNotEmpty } from 'class-validator';
 
-export class CreateTodoDto {
+export class CreateTaskDto {
+  @ApiProperty()
   @IsNotEmpty()
   @IsString()
   name: string;
 
+  @ApiProperty()
   @IsOptional()
   @IsBoolean()
   done?: boolean;
-}
-
-export class FindTodoDto {
-  @IsNotEmpty()
-  @IsBoolean()
-  id: boolean;
 }
