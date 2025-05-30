@@ -4,51 +4,56 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import { CreateTaskDto } from './dto/create-task-dto';
-import { UpdateTaskDto } from './dto/update-task-dto';
+import { createTaskDto } from './dto/create-task-dto';
+import { updateTaskDto } from './dto/update-task-dto';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectRepository(TaskEntity)
-    private readonly repo: Repository<TaskEntity>,
+    private readonly taskRepository: Repository<TaskEntity>,
   ) {}
 
   findAll(): Promise<TaskEntity[]> {
-    return this.repo.find();
+    return this.taskRepository.find({
+      order: {
+        id: 'DESC',
+      },
+    });
   }
 
   async findOne(id: number): Promise<TaskEntity> {
-    const task = await this.repo.findOneBy({ id });
+    const task = await this.taskRepository.findOneBy({ id });
 
     if (!task) {
-      throw new NotFoundException(`Not found ${id}`);
+      throw new NotFoundException(`Entity task with id ${id} not found`);
     }
 
     return task;
   }
 
-  async create(dto: CreateTaskDto): Promise<TaskEntity> {
-    const task = this.repo.create({
+  async create(dto: createTaskDto): Promise<TaskEntity> {
+    const task = this.taskRepository.create({
       name: dto.name,
       done: dto.done ?? false,
     });
 
-    return await this.repo.save(task);
+    return await this.taskRepository.save(task);
   }
 
-  async update(id: number, dto: UpdateTaskDto): Promise<TaskEntity> {
+  async update(id: number, dto: updateTaskDto): Promise<TaskEntity> {
     const task = await this.findOne(id);
-    Object.assign(task, dto);
+    const updated = {
+      ...task,
+      ...dto,
+    };
 
-    return await this.repo.save(task);
+    return await this.taskRepository.save(updated);
   }
 
-  async remove(id: number): Promise<void> {
-    const result = await this.repo.delete(id);
-
-    if (result.affected === 0) {
-      throw new NotFoundException(`Not found ${id}`);
-    }
+  async remove(id: number): Promise<boolean> {
+    await this.findOne(id);
+    await this.taskRepository.delete(id);
+    return true;
   }
 }

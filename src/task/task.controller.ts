@@ -10,8 +10,8 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { CreateTaskDto } from './dto/create-task-dto';
-import { UpdateTaskDto } from './dto/update-task-dto';
+import { createTaskDto } from './dto/create-task-dto';
+import { updateTaskDto } from './dto/update-task-dto';
 import { TaskEntity } from './task.entity';
 
 import {
@@ -25,43 +25,43 @@ import {
 @ApiTags('todos')
 @Controller('todos')
 export class TaskController {
-  constructor(private readonly todoService: TaskService) {}
+  constructor(private readonly taskService: TaskService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get tasks' })
   @ApiResponse({ status: 200, type: [TaskEntity] })
   findAll(): Promise<TaskEntity[]> {
-    return this.todoService.findAll();
+    return this.taskService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get task from ID' })
+  @ApiOperation({ summary: 'Get task by ID' })
   @ApiParam({ name: 'id', example: 1 })
   @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<TaskEntity> {
-    return this.todoService.findOne(id);
+    return this.taskService.findOne(id);
   }
 
   @Post()
   @ApiOperation({ summary: 'Create task' })
-  @ApiBody({ type: CreateTaskDto })
+  @ApiBody({ type: createTaskDto })
   @ApiResponse({ status: 201, type: TaskEntity })
-  create(@Body() dto: CreateTaskDto): Promise<TaskEntity> {
-    return this.todoService.create(dto);
+  create(@Body() dto: createTaskDto): Promise<TaskEntity> {
+    return this.taskService.create(dto);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Refresh task' })
   @ApiParam({ name: 'id', example: 1 })
-  @ApiBody({ type: UpdateTaskDto })
+  @ApiBody({ type: updateTaskDto })
   @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateTaskDto,
+    @Body() dto: updateTaskDto,
   ): Promise<TaskEntity> {
-    return this.todoService.update(id, dto);
+    return this.taskService.update(id, dto);
   }
 
   @Delete(':id')
@@ -70,7 +70,7 @@ export class TaskController {
   @ApiResponse({ status: 204, description: 'Deleted' })
   @ApiResponse({ status: 404, description: 'Not found' })
   @HttpCode(204)
-  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.todoService.remove(id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
+    return this.taskService.remove(id);
   }
 }
