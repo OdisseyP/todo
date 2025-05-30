@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { TodoEntity } from 'src/todos/todo.entity';
+import { TaskEntity } from 'src/task/task.entity';
 
 @Injectable()
 export class TypeOrmConfigService implements TypeOrmOptionsFactory {
@@ -15,7 +15,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
       username: this.configService.getOrThrow('POSTGRES_USER'),
       password: this.configService.getOrThrow('POSTGRES_PASSWORD'),
       database: this.configService.getOrThrow('POSTGRES_DB'),
-      entities: [TodoEntity],
+      entities: [TaskEntity],
       synchronize: false,
     };
   }
