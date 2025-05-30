@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { createTaskDto } from './dto/create-task-dto';
-import { updateTaskDto } from './dto/update-task-dto';
+import { UpdateTaskDto } from './dto/update-task-dto';
 import { TaskEntity } from './task.entity';
 
 import {
@@ -52,14 +52,14 @@ export class TaskController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Refresh task' })
+  @ApiOperation({ summary: 'Update task' })
   @ApiParam({ name: 'id', example: 1 })
-  @ApiBody({ type: updateTaskDto })
+  @ApiBody({ type: UpdateTaskDto })
   @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: updateTaskDto,
+    @Body() dto: UpdateTaskDto,
   ): Promise<TaskEntity> {
     return this.taskService.update(id, dto);
   }

@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import { createTaskDto } from './dto/create-task-dto';
-import { updateTaskDto } from './dto/update-task-dto';
+import { UpdateTaskDto } from './dto/update-task-dto';
 
 @Injectable()
 export class TaskService {
@@ -26,7 +24,7 @@ export class TaskService {
     const task = await this.taskRepository.findOneBy({ id });
 
     if (!task) {
-      throw new NotFoundException(`Entity task with id ${id} not found`);
+      throw new NotFoundException(`Task with id ${id} not found`);
     }
 
     return task;
@@ -41,19 +39,19 @@ export class TaskService {
     return await this.taskRepository.save(task);
   }
 
-  async update(id: number, dto: updateTaskDto): Promise<TaskEntity> {
+  async update(id: number, dto: UpdateTaskDto): Promise<TaskEntity> {
     const task = await this.findOne(id);
-    const updated = {
+
+    return this.taskRepository.save({
       ...task,
       ...dto,
-    };
-
-    return await this.taskRepository.save(updated);
+    });
   }
 
   async remove(id: number): Promise<boolean> {
     await this.findOne(id);
     await this.taskRepository.delete(id);
+
     return true;
   }
 }
