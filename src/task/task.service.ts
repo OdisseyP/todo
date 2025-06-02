@@ -32,20 +32,20 @@ export class TaskService {
   }
 
   async create(dto: createTaskDto): Promise<TaskEntity> {
-    const newTask = this.taskRepository.create({
+    const createTask = this.taskRepository.create({
       name: dto.name,
       done: dto.done ?? false,
       status: dto.status ?? TaskStatus.Pending,
     });
 
-    return await this.taskRepository.save(newTask);
+    return await this.taskRepository.save(createTask);
   }
 
   async update(id: number, dto: UpdateTaskDto): Promise<TaskEntity> {
-    const updatedTask = await this.findOne(id);
+    const updateTask = await this.findOne(id);
 
     return this.taskRepository.save({
-      ...updatedTask,
+      ...updateTask,
       ...dto,
     });
   }

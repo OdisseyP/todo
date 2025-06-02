@@ -16,7 +16,7 @@ export class TaskEntity {
   @Column({ default: false })
   done: boolean;
 
-  @ApiProperty({ example: TaskStatus.Pending, description: 'Статус задачи' })
+  @ApiProperty()
   @Column({
     type: 'enum',
     enum: TaskStatus,
