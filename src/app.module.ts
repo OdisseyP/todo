@@ -5,6 +5,7 @@ import { TodosModule } from './task/task.module';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './configs/typeorm-config.service';
+import { UserModule } from './user/user.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -18,6 +19,7 @@ import { TypeOrmConfigService } from './configs/typeorm-config.service';
     }),
 
     TodosModule,
+    UserModule,
   ],
 
   controllers: [AppController],
