@@ -65,7 +65,7 @@ export class TaskController {
     return this.taskService.update(id, UpdateTaskDto);
   }
 
-  @Patch('id:/status')
+  @Patch(':id/status')
   @ApiOperation({ summary: 'Change Status' })
   @ApiParam({ name: 'id', example: 1, description: 'Task ID' })
   @ApiBody({ type: ChangeStatusDto })
