@@ -13,6 +13,7 @@ import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task-dto';
 import { UpdateTaskDto } from './dto/update-task-dto';
 import { TaskEntity } from './task.entity';
+import { ChangeStatusDto } from './dto/change-status-dto';
 
 import {
   ApiTags,
@@ -62,6 +63,19 @@ export class TaskController {
     @Body() UpdateTaskDto: UpdateTaskDto,
   ): Promise<TaskEntity> {
     return this.taskService.update(id, UpdateTaskDto);
+  }
+
+  @Patch('id:/status')
+  @ApiOperation({ summary: 'Change Status' })
+  @ApiParam({ name: 'id', example: 1, description: 'Task ID' })
+  @ApiBody({ type: ChangeStatusDto })
+  @ApiResponse({ status: 200, type: TaskEntity })
+  @ApiResponse({ status: 404, description: 'Task not found' })
+  async changeStatus(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() ChangeStatusDto: ChangeStatusDto,
+  ): Promise<TaskEntity> {
+    return this.taskService.changeStatus(id, ChangeStatusDto.status);
   }
 
   @Delete(':id')

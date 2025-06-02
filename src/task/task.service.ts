@@ -56,4 +56,11 @@ export class TaskService {
 
     return true;
   }
+
+  async changeStatus(id: number, status: TaskStatus): Promise<TaskEntity> {
+    const task = await this.findOne(id);
+    task.status = status;
+
+    return this.taskRepository.save(task);
+  }
 }
