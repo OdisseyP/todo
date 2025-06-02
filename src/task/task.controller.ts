@@ -10,7 +10,7 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
-import { createTaskDto } from './dto/create-task-dto';
+import { CreateTaskDto } from './dto/create-task-dto';
 import { UpdateTaskDto } from './dto/update-task-dto';
 import { TaskEntity } from './task.entity';
 
@@ -45,10 +45,10 @@ export class TaskController {
 
   @Post()
   @ApiOperation({ summary: 'Create task' })
-  @ApiBody({ type: createTaskDto })
+  @ApiBody({ type: CreateTaskDto })
   @ApiResponse({ status: 201, type: TaskEntity })
-  create(@Body() dto: createTaskDto): Promise<TaskEntity> {
-    return this.taskService.create(dto);
+  create(@Body() CreateTaskDto: CreateTaskDto): Promise<TaskEntity> {
+    return this.taskService.create(CreateTaskDto);
   }
 
   @Patch(':id')
@@ -59,9 +59,9 @@ export class TaskController {
   @ApiResponse({ status: 404, description: 'Not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: UpdateTaskDto,
+    @Body() UpdateTaskDto: UpdateTaskDto,
   ): Promise<TaskEntity> {
-    return this.taskService.update(id, dto);
+    return this.taskService.update(id, UpdateTaskDto);
   }
 
   @Delete(':id')

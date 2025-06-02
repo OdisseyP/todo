@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
-import { createTaskDto } from './dto/create-task-dto';
+import { CreateTaskDto } from './dto/create-task-dto';
 import { UpdateTaskDto } from './dto/update-task-dto';
 import { TaskStatus } from './tast-status';
 
@@ -31,7 +31,7 @@ export class TaskService {
     return findTask;
   }
 
-  async create(dto: createTaskDto): Promise<TaskEntity> {
+  async create(dto: CreateTaskDto): Promise<TaskEntity> {
     const createTask = this.taskRepository.create({
       name: dto.name,
       done: dto.done ?? false,
