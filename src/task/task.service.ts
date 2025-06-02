@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { TaskEntity } from './task.entity';
 import { createTaskDto } from './dto/create-task-dto';
 import { UpdateTaskDto } from './dto/update-task-dto';
+import { TaskStatus } from './tast-status';
 
 @Injectable()
 export class TaskService {
@@ -21,29 +22,30 @@ export class TaskService {
   }
 
   async findOne(id: number): Promise<TaskEntity> {
-    const task = await this.taskRepository.findOneBy({ id });
+    const findTask = await this.taskRepository.findOneBy({ id });
 
-    if (!task) {
+    if (!findTask) {
       throw new NotFoundException(`Task with id ${id} not found`);
     }
 
-    return task;
+    return findTask;
   }
 
   async create(dto: createTaskDto): Promise<TaskEntity> {
-    const task = this.taskRepository.create({
+    const newTask = this.taskRepository.create({
       name: dto.name,
       done: dto.done ?? false,
+      status: dto.status ?? TaskStatus.Pending,
     });
 
-    return await this.taskRepository.save(task);
+    return await this.taskRepository.save(newTask);
   }
 
   async update(id: number, dto: UpdateTaskDto): Promise<TaskEntity> {
-    const task = await this.findOne(id);
+    const updatedTask = await this.findOne(id);
 
     return this.taskRepository.save({
-      ...task,
+      ...updatedTask,
       ...dto,
     });
   }
