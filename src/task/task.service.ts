@@ -20,6 +20,7 @@ export class TaskService {
         order: { id: 'DESC' },
       });
     }
+
     return this.taskRepository.find({ order: { id: 'DESC' } });
   }
 

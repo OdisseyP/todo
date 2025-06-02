@@ -25,8 +25,8 @@ import {
 } from '@nestjs/swagger';
 import { TaskStatus } from './tast-status';
 
-@ApiTags('task')
-@Controller('task')
+@ApiTags('tasks')
+@Controller('tasks')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
