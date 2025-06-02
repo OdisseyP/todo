@@ -9,18 +9,18 @@ export class UserEntity {
 
   @ApiProperty({
     example: 'iloveandroid@example.com',
-    description: 'USER EMAIL',
+    description: 'User email',
   })
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ example: 'Steve', description: 'Full user name' })
+  @ApiProperty({ example: 'Steve', description: 'User name' })
   @Column()
-  FirstName: string;
+  firstName: string;
 
-  @ApiProperty({ example: 'Jobs', description: 'Full user surname' })
+  @ApiProperty({ example: 'Jobs', description: 'User surname' })
   @Column()
-  LastName: string;
+  lastName: string;
 
   @ApiProperty({ example: 'hashed_password', description: 'User password' })
   @Column()
