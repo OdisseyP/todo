@@ -14,11 +14,15 @@ export class UserEntity {
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ example: 'Steve Jobs', description: 'USER NAME' })
+  @ApiProperty({ example: 'Steve', description: 'Full user name' })
   @Column()
-  name: string;
+  FirstName: string;
 
-  @ApiProperty({ example: 'qwerty123', description: 'USER PASSWORD' })
+  @ApiProperty({ example: 'Jobs', description: 'Full user surname' })
+  @Column()
+  LastName: string;
+
+  @ApiProperty({ example: 'hashed_password', description: 'USER PASSWORD' })
   @Column()
   password: string;
 }
