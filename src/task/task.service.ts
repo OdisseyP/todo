@@ -13,12 +13,14 @@ export class TaskService {
     private readonly taskRepository: Repository<TaskEntity>,
   ) {}
 
-  findAll(): Promise<TaskEntity[]> {
-    return this.taskRepository.find({
-      order: {
-        id: 'DESC',
-      },
-    });
+  findAll(status?: TaskStatus): Promise<TaskEntity[]> {
+    if (status) {
+      return this.taskRepository.find({
+        where: { status },
+        order: { id: 'DESC' },
+      });
+    }
+    return this.taskRepository.find({ order: { id: 'DESC' } });
   }
 
   async findOne(id: number): Promise<TaskEntity> {

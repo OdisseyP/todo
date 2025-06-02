@@ -8,6 +8,7 @@ import {
   Delete,
   Post,
   HttpCode,
+  Query,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task-dto';
@@ -22,17 +23,18 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { TaskStatus } from './tast-status';
 
-@ApiTags('todos')
-@Controller('todos')
+@ApiTags('task')
+@Controller('task')
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get()
   @ApiOperation({ summary: 'Get tasks' })
   @ApiResponse({ status: 200, type: [TaskEntity] })
-  findAll(): Promise<TaskEntity[]> {
-    return this.taskService.findAll();
+  findAll(@Query('status') status?: TaskStatus): Promise<TaskEntity[]> {
+    return this.taskService.findAll(status);
   }
 
   @Get(':id')
@@ -65,7 +67,7 @@ export class TaskController {
     return this.taskService.update(id, UpdateTaskDto);
   }
 
-  @Patch('id:/status')
+  @Patch(':id/status')
   @ApiOperation({ summary: 'Change Status' })
   @ApiParam({ name: 'id', example: 1, description: 'Task ID' })
   @ApiBody({ type: ChangeStatusDto })
