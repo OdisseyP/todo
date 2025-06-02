@@ -11,20 +11,20 @@ export class RegisterUserDto {
 
   @ApiProperty({
     example: 'Ivan',
-    description: 'User name',
+    description: 'User first name',
   })
   @IsString({ message: 'Name must be a string' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(26, { message: 'Name must be less than 26 characters' })
+  @MaxLength(26, { message: 'First name must be less than 26 characters' })
   FirstName: string;
 
   @ApiProperty({
     example: 'Ivan',
-    description: 'User surname',
+    description: 'User last name',
   })
   @IsString({ message: 'Name must be a string' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(26, { message: 'Surname must be less than 26 characters' })
+  @MaxLength(26, { message: 'Last name must be less than 26 characters' })
   LastName: string;
 
   @ApiProperty({
