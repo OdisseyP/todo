@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsOptional, IsNotEmpty } from 'class-validator';
-import { TaskStatus } from '../tast-status';
+import { TaskStatus } from '../task-status';
 
 export class CreateTaskDto {
   @ApiProperty()

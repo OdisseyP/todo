@@ -13,7 +13,7 @@ export class RegisterUserDto {
     example: 'Ivan',
     description: 'User first name',
   })
-  @IsString({ message: 'Name must be a string' })
+  @IsString({ message: 'First name must be a string' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
   @MaxLength(26, { message: 'First name must be less than 26 characters' })
   FirstName: string;
@@ -22,16 +22,18 @@ export class RegisterUserDto {
     example: 'Ivan',
     description: 'User last name',
   })
-  @IsString({ message: 'Name must be a string' })
+  @IsString({ message: 'Last name must be a string' })
   @MinLength(2, { message: 'Name must be at least 2 characters long' })
   @MaxLength(26, { message: 'Last name must be less than 26 characters' })
   LastName: string;
 
   @ApiProperty({
     example: 'strongExamplePassword123$',
-    description: 'User password (minimun 6 characters)',
+    description: 'User password (minimum 6 characters)',
   })
   @IsString({ message: 'Password must be a string' })
   @MinLength(6, { message: 'Password must at least 6 characters long' })
   password: string;
 }
+
+//Написать в описании, что нужны ласт токены

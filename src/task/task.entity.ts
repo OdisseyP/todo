@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { TaskStatus } from './tast-status';
+import { TaskStatus } from './task-status';
 
 @Entity('tasks')
 export class TaskEntity {
