@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from 'src/task/dto/register-user.dto';
 import { QueryFailedError } from 'typeorm';
 import { UserResponseDto } from 'src/task/dto/user-response-dto';
+import { instanceToInstance, plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -29,7 +30,6 @@ export class UsersService {
 
     try {
       hashedPassword = await bcrypt.hash(dto.password, 10);
-
     } catch {
       throw new InternalServerErrorException('Error hashing password');
     }
@@ -44,15 +44,15 @@ export class UsersService {
     try {
       const saved = await this.userRepository.save(user);
 
-      return new UserResponseDto(saved);
+      return plainToInstance(UserResponseDto, saved, {
+        excludeExtraneousValues: true,
+      });
     } catch (err) {
-
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;
 
         if (code === '23503') {
-
           throw new ConflictException('User with this email already exists');
         }
       }
