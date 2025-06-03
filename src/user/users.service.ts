@@ -29,6 +29,7 @@ export class UsersService {
 
     try {
       hashedPassword = await bcrypt.hash(dto.password, 10);
+
     } catch {
       throw new InternalServerErrorException('Error hashing password');
     }
@@ -45,11 +46,13 @@ export class UsersService {
 
       return new UserResponseDto(saved);
     } catch (err) {
+
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;
 
         if (code === '23503') {
+
           throw new ConflictException('User with this email already exists');
         }
       }
