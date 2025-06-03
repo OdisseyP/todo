@@ -1,38 +1,38 @@
-import { IsEmail, IsString, MaxLength, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, MaxLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class RegisterUserDto {
   @ApiProperty({
-    example: 'primer@example.com',
-    description: 'User email (must be unique)',
+    example: 'hellowhatsapp@example.com',
+    description: 'User email address (must be unique)',
   })
-  @IsEmail({}, { message: 'Email must be a valid' })
+  @IsEmail({}, { message: 'Email must be a valid email address' })
   email: string;
 
   @ApiProperty({
-    example: 'Ivan',
-    description: 'User first name',
+    example: 'Steve',
+    description: 'First name of the user (2–25 characters)',
   })
   @IsString({ message: 'First name must be a string' })
-  @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(26, { message: 'First name must be less than 26 characters' })
-  FirstName: string;
+  @MinLength(2, { message: 'First name must be at least 2 characters long' })
+  @MaxLength(25, { message: 'First name must be less than 26 characters' })
+  firstName: string;
 
   @ApiProperty({
-    example: 'Ivan',
-    description: 'User last name',
+    example: 'Minecraft',
+    description: 'Last name of the user (2–25 characters)',
   })
   @IsString({ message: 'Last name must be a string' })
-  @MinLength(2, { message: 'Name must be at least 2 characters long' })
-  @MaxLength(26, { message: 'Last name must be less than 26 characters' })
-  LastName: string;
+  @MinLength(2, { message: 'Last name must be at least 2 characters long' })
+  @MaxLength(25, { message: 'Last name must be less than 26 characters' })
+  lastName: string;
 
   @ApiProperty({
-    example: 'strongExamplePassword123$',
-    description: 'User password (minimum 6 characters)',
+    example: 'sTRongpass123$!',
+    description: 'Password (minimum 6 characters)',
   })
   @IsString({ message: 'Password must be a string' })
-  @MinLength(6, { message: 'Password must at least 6 characters long' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password: string;
 }
 

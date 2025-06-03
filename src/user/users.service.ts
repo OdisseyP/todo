@@ -6,8 +6,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
-import { RegisterUserDto } from 'src/task/dto/register-user.dto';
 import * as bcrypt from 'bcrypt';
+import { RegisterUserDto } from 'src/task/dto/register-user.dto';
+import { QueryFailedError } from 'typeorm';
 
 @Injectable()
 export class UsersService {
@@ -16,36 +17,42 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: RegisterUserDto) {
+  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password'>> {
     const existing = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existing) {
-      throw new ConflictException('User with this email already exist');
+      throw new ConflictException('User with this email already exists');
     }
 
-    const saltRounds = 10;
     let hashedPassword: string;
-
     try {
-      hashedPassword = await bcrypt.hash(dto.password, saltRounds);
+      hashedPassword = await bcrypt.hash(dto.password, 10);
     } catch {
       throw new InternalServerErrorException('Error hashing password');
     }
 
     const user = this.userRepository.create({
       email: dto.email,
-      firstName: dto.FirstName,
-      lastName: dto.LastName,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
       password: hashedPassword,
     });
 
     try {
-      await this.userRepository.save(user);
-    } catch (err: any) {
-      //   if (err.code === '23505') {
-      //     throw new ConflictException('User with this email already exist');
-      //   }
-      console.log(err);
+      const saved = await this.userRepository.save(user);
+
+      const { password: _password, ...result } = saved;
+      void _password;
+
+      return result;
+    } catch (err) {
+      if (err instanceof QueryFailedError) {
+        const drv = err.driverError as Record<string, unknown>;
+        const code = drv?.code as string | undefined;
+        if (code === '23503') {
+          throw new ConflictException('User with this email already exists');
+        }
+      }
       throw new InternalServerErrorException('Error creating user');
     }
   }
