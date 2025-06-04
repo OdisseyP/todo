@@ -23,7 +23,7 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
-import { TaskStatus } from './tast-status';
+import { TaskStatus } from './task-status';
 
 @ApiTags('tasks')
 @Controller('tasks')
