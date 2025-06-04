@@ -1,32 +1,29 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { UsersService } from './users.service';
-import { RegisterUserDto } from 'src/task/dto/register-user.dto';
-import { UserEntity } from './user.entity';
+import { ApiTags, ApiOperation, ApiBody, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('users')
-@Controller('users')
-export class UsersController {
-  constructor(private readonly userService: UsersService) {}
+import { UsersService } from '../user/users.service';
+import { RegisterUserDto } from '../task/dto/register-user.dto';
+import { UserResponseDto } from '../task/dto/user-response-dto';
+
+@ApiTags('auth')
+@Controller('auth')
+export class UserController {
+  constructor(private readonly usersService: UsersService) {}
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register a new user' })
+  @ApiOperation({ summary: 'Register new user' })
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
     status: 201,
-    type: UserEntity,
     description: 'User successfully registered',
+    type: UserResponseDto,
   })
   @ApiResponse({
     status: 409,
-    description: 'User with this email already exists',
+    description: 'Email already exists',
   })
-  async register(
-    @Body() dto: RegisterUserDto,
-  ): Promise<Omit<UserEntity, 'password'>> {
-    const user = this.userService.register(dto);
-
-    return user;
+  async register(@Body() dto: RegisterUserDto): Promise<UserResponseDto> {
+    return this.usersService.register(dto);
   }
 }
