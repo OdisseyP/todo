@@ -1,21 +1,22 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { UsersService } from 'src/user/users.service';
 import { RegisterUserDto } from 'src/task/dto/register-user.dto';
-import { UserEntity } from 'src/user/user.entity';
-import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { AuthService } from './auth.service';
+import { AuthTokenDto } from './auth-tokens-dto';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  @Post('register')
+  @Post('registration')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register a new user' })
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
     status: 201,
-    type: UserEntity,
     description: 'User successfully registered',
+    type: AuthTokenDto,
   })
   @ApiResponse({
     status: 409,
@@ -23,7 +24,8 @@ export class AuthController {
   })
   async register(
     @Body() registerUserDto: RegisterUserDto,
-  ): Promise<Omit<UserEntity, 'password'>> {
-    return this.usersService.register(registerUserDto);
+  ): Promise<AuthTokenDto> {
+    //
+    return this.authService.register(registerUserDto);
   }
 }

@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
+import { RefreshTokenEntity } from 'src/refresh-token.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -25,4 +26,7 @@ export class UserEntity {
   @ApiProperty({ example: 'hashed_password', description: 'User password' })
   @Column()
   password: string;
+
+  @OneToMany(() => RefreshTokenEntity, (rt) => rt.user)
+  refreshTokens: RefreshTokenEntity[];
 }

@@ -19,7 +19,7 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password'>> {
+  async register(dto: RegisterUserDto): Promise<UserResponseDto> {
     const existing = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existing) {
