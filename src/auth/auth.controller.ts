@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { RegisterUserDto } from 'src/task/dto/register-user.dto';
 import { ApiTags, ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { AuthTokenDto } from './auth-tokens-dto';
+import { AuthTokensDto } from './auth-tokens-dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -16,7 +16,7 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'User successfully registered',
-    type: AuthTokenDto,
+    type: AuthTokensDto,
   })
   @ApiResponse({
     status: 409,
@@ -24,8 +24,7 @@ export class AuthController {
   })
   async register(
     @Body() registerUserDto: RegisterUserDto,
-  ): Promise<AuthTokenDto> {
-    //
+  ): Promise<AuthTokensDto> {
     return this.authService.register(registerUserDto);
   }
 }

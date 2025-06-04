@@ -1,15 +1,21 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
+import { IsNumber, IsEmail, IsString } from 'class-validator';
 
+@Exclude()
 export class UserResponseDto {
-  @ApiProperty({ example: 1 })
+  @Expose()
+  @IsNumber()
   id: number;
 
-  @ApiProperty({ example: 'demo@x.com' })
+  @Expose()
+  @IsEmail()
   email: string;
 
-  @ApiProperty({ example: 'Steve' })
+  @Expose()
+  @IsString()
   firstName: string;
 
-  @ApiProperty({ example: 'Minecraft' })
+  @Expose()
+  @IsString()
   lastName: string;
 }
