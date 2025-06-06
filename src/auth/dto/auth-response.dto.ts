@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { UserInformationDto } from './user-information.dto';
 
 export class AuthResponseDto {
   @ApiProperty({
@@ -14,18 +15,8 @@ export class AuthResponseDto {
   refreshToken: string;
 
   @ApiProperty({
-    example: {
-      id: 1,
-      email: 'user@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-    },
     description: 'User information',
+    type: UserInformationDto,
   })
-  user: {
-    id: number;
-    email: string;
-    firstName: string;
-    lastName: string;
-  };
+  user: UserInformationDto;
 }

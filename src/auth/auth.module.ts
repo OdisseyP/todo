@@ -4,10 +4,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/user/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UserEntity } from 'src/user/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([]),
+    TypeOrmModule.forFeature([UserEntity]),
     UsersModule,
     JwtModule.register({
       global: true,

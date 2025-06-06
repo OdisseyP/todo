@@ -26,6 +26,5 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
   refreshToken?: string;
 }

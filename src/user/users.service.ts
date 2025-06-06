@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserDto } from 'src/task/dto/register-user.dto';
+import { RegisterUserDto as CreateUserDto } from 'src/task/dto/register-user.dto';
 import { QueryFailedError } from 'typeorm';
 import { UserResponseDto } from 'src/task/dto/user-response-dto';
 import { plainToInstance } from 'class-transformer';
@@ -20,9 +20,11 @@ export class UsersService {
   ) {}
 
   async register(
-    dto: RegisterUserDto,
+    dto: CreateUserDto,
   ): Promise<Omit<UserEntity, 'password' | 'refreshToken'>> {
-    const existing = await this.userRepository.findOneBy({ email: dto.email });
+    const existing = await this.userRepository.findOneBy({
+      email: dto.email,
+    });
 
     if (existing) {
       throw new ConflictException('User with this email already exists');
@@ -78,12 +80,11 @@ export class UsersService {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async updateRefreshToken(
-    userId: number,
-    refreshToken: string | null,
-  ): Promise<void> {
-    await this.userRepository.update(userId, {
-      refreshToken: refreshToken || undefined,
-    });
+  async findAllUsers(): Promise<
+    Omit<UserEntity, 'password' | 'refreshToken'>[]
+  > {
+    const users = await this.userRepository.find();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return users.map(({ password, refreshToken, ...user }) => user);
   }
 }

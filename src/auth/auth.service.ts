@@ -4,17 +4,23 @@ import { UsersService } from '../user/users.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import * as bcrypt from 'bcrypt';
+import { UserInformationDto } from './dto/user-information.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from 'src/user/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.usersService.findByEmail(loginDto.email);
-    
+
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
@@ -31,33 +37,43 @@ export class AuthService {
     const tokens = this.generateTokens(user.id, user.email);
 
     const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
-    await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
+    await this.updateRefreshToken(user.id, hashedRefreshToken);
+
+    const userInfo: UserInformationDto = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-      },
+      user: userInfo,
     };
   }
 
-  async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async refresh(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const payload = this.jwtService.verify(refreshToken, {
         secret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
       });
-      
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const user = await this.usersService.findById(payload.sub);
-      
+
       if (!user || !user.refreshToken) {
         throw new UnauthorizedException('Invalid refresh token');
       }
 
-      const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.refreshToken);
+      const isRefreshTokenValid = await bcrypt.compare(
+        refreshToken,
+        user.refreshToken,
+      );
+
       if (!isRefreshTokenValid) {
         throw new UnauthorizedException('Invalid refresh token');
       }
@@ -65,7 +81,7 @@ export class AuthService {
       const tokens = this.generateTokens(user.id, user.email);
 
       const hashedRefreshToken = await bcrypt.hash(tokens.refreshToken, 10);
-      await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
+      await this.updateRefreshToken(user.id, hashedRefreshToken);
 
       return {
         accessToken: tokens.accessToken,
@@ -80,12 +96,21 @@ export class AuthService {
   }
 
   async logout(userId: number): Promise<void> {
-    await this.usersService.updateRefreshToken(userId, null);
+    await this.updateRefreshToken(userId, null);
+  }
+
+  async updateRefreshToken(
+    userId: number,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.userRepository.update(userId, {
+      refreshToken: refreshToken || undefined,
+    });
   }
 
   private generateTokens(userId: number, email: string) {
     const payload = { email, sub: userId };
-    
+
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_SECRET || 'your-secret-key',
       expiresIn: process.env.JWT_EXPIRATION || '15m',
