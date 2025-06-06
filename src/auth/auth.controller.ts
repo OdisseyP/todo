@@ -46,11 +46,11 @@ export class AuthController {
   @ApiResponse({
     status: 200,
     type: AuthResponseDto,
-    description: 'Успешная аутентификация',
+    description: 'Successful authentication',
   })
   @ApiResponse({
     status: 401,
-    description: 'Неверный email или пароль',
+    description: 'Invalid email or password',
   })
   async login(@Body() loginDto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(loginDto);
@@ -66,14 +66,14 @@ export class AuthController {
         refreshToken: {
           type: 'string',
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-          description: 'Refresh токен'
+          description: 'Refresh token'
         }
       }
     }
   })
   @ApiResponse({
     status: 200,
-    description: 'Успешное обновление токенов',
+    description: 'Successful token refresh',
     schema: {
       type: 'object',
       properties: {
@@ -84,7 +84,7 @@ export class AuthController {
   })
   @ApiResponse({
     status: 401,
-    description: 'Недействительный refresh токен',
+    description: 'Invalid refresh token',
   })
   async refresh(@Body('refreshToken') refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.refresh(refreshToken);

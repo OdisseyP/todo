@@ -4,17 +4,17 @@ import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 export class LoginDto {
   @ApiProperty({
     example: 'user@example.com',
-    description: 'Email пользователя',
+    description: 'User email address',
   })
-  @IsEmail({}, { message: 'Неверный формат email' })
-  @IsNotEmpty({ message: 'Email не может быть пустым' })
+  @IsEmail({}, { message: 'Invalid email format' })
+  @IsNotEmpty({ message: 'Email cannot be empty' })
   email: string;
 
   @ApiProperty({
     example: 'password123',
-    description: 'Пароль пользователя',
+    description: 'User password',
   })
-  @IsString({ message: 'Пароль должен быть строкой' })
-  @IsNotEmpty({ message: 'Пароль не может быть пустым' })
+  @IsString({ message: 'Password must be a string' })
+  @IsNotEmpty({ message: 'Password cannot be empty' })
   password: string;
 }

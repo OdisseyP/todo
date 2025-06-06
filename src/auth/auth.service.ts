@@ -16,7 +16,7 @@ export class AuthService {
     const user = await this.usersService.findByEmail(loginDto.email);
     
     if (!user) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const isPasswordValid = await this.usersService.validatePassword(
@@ -25,7 +25,7 @@ export class AuthService {
     );
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Неверный email или пароль');
+      throw new UnauthorizedException('Invalid email or password');
     }
 
     const tokens = this.generateTokens(user.id, user.email);
@@ -54,12 +54,12 @@ export class AuthService {
       const user = await this.usersService.findById(payload.sub);
       
       if (!user || !user.refreshToken) {
-        throw new UnauthorizedException('Недействительный refresh токен');
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.refreshToken);
       if (!isRefreshTokenValid) {
-        throw new UnauthorizedException('Недействительный refresh токен');
+        throw new UnauthorizedException('Invalid refresh token');
       }
 
       const tokens = this.generateTokens(user.id, user.email);
@@ -75,7 +75,7 @@ export class AuthService {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
-      throw new UnauthorizedException('Недействительный refresh токен');
+      throw new UnauthorizedException('Invalid refresh token');
     }
   }
 

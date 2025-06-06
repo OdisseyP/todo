@@ -3,13 +3,13 @@ import { ApiProperty } from '@nestjs/swagger';
 export class AuthResponseDto {
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: 'Access токен',
+    description: 'Access token',
   })
   accessToken: string;
 
   @ApiProperty({
     example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-    description: 'Refresh токен',
+    description: 'Refresh token',
   })
   refreshToken: string;
 
@@ -20,7 +20,7 @@ export class AuthResponseDto {
       firstName: 'John',
       lastName: 'Doe',
     },
-    description: 'Информация о пользователе',
+    description: 'User information',
   })
   user: {
     id: number;
