@@ -10,7 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterUserDto } from 'src/task/dto/register-user.dto';
 import { QueryFailedError } from 'typeorm';
 import { UserResponseDto } from 'src/task/dto/user-response-dto';
-import { instanceToInstance, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +19,7 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password'>> {
+  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password' | 'refreshToken'>> {
     const existing = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existing) {
@@ -59,5 +59,23 @@ export class UsersService {
 
       throw new InternalServerErrorException('Error creating user');
     }
+  }
+
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return this.userRepository.findOneBy({ email });
+  }
+
+  async findById(id: number): Promise<UserEntity | null> {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+    await this.userRepository.update(userId, { 
+      refreshToken: refreshToken || undefined 
+    });
   }
 }
