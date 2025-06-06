@@ -4,21 +4,20 @@ import { UsersService } from '../user/users.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import * as bcrypt from 'bcrypt';
-import { UserInformationDto } from './dto/user-information.dto';
+import { UserInformationDto } from '../user/dto/user-information.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/user/user.entity';
-
-interface JwtPayload {
-  email: string;
-  sub: number;
-}
-
+import { JwtPayload } from './jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
+  [x: string]: any;
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService,
+
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
@@ -63,7 +62,7 @@ export class AuthService {
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET ?? 'your-secret-key',
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       });
 
       const user = await this.usersService.findById(payload.sub);
@@ -101,27 +100,19 @@ export class AuthService {
   async logout(userId: number): Promise<void> {
     await this.updateRefreshToken(userId, null);
   }
-
-  async updateRefreshToken(
-    userId: number,
-    refreshToken: string | null,
-  ): Promise<void> {
-    await this.userRepository.update(userId, {
-      refreshToken: refreshToken || undefined,
-    });
-  }
+  // async updateRefreshToken(userId: number, refreshToken: string | null):
 
   private generateTokens(userId: number, email: string) {
     const payload = { email, sub: userId };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET ?? 'your-secret-key',
-      expiresIn: process.env.JWT_EXPIRATION ?? '15m',
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_EXPIRATION'),
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET ?? 'your-refresh-secret-key',
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION ?? '7d',
+      secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRATION'),
     });
 
     return {

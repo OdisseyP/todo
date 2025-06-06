@@ -10,8 +10,9 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
-import { RegisterUserDto } from 'src/task/dto/register-user.dto';
+import { RegisterUserDto } from 'src/user/dto/register-user.dto';
 import { UserEntity } from './user.entity';
+import { SafeUser, SafeUserArray } from './user.types';
 
 @ApiTags('users')
 @Controller('users')
@@ -46,9 +47,7 @@ export class UsersController {
     description: 'List of all users',
     type: [UserEntity],
   })
-  async getAllUsers(): Promise<
-    Omit<UserEntity, 'password' | 'refreshToken'>[]
-  > {
+  async getAllUsers(): Promise<SafeUserArray> {
     return this.userService.findAllUsers();
   }
 
@@ -68,19 +67,7 @@ export class UsersController {
     status: 404,
     description: 'User not found',
   })
-  async getUserById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<Omit<UserEntity, 'password' | 'refreshToken'> | null> {
-    const user = await this.userService.findById(id);
-
-    if (!user) {
-      return null;
-    }
-    const {
-      password: _password,
-      refreshToken: _refreshToken,
-      ...userWithoutSensitiveData
-    } = user;
-    return userWithoutSensitiveData;
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
+    return this.userService.getSafeUserById(id);
   }
 }
