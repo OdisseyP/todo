@@ -9,6 +9,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from 'src/user/user.entity';
 
+interface JwtPayload {
+  email: string;
+  sub: number;
+}
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -57,12 +62,10 @@ export class AuthService {
     refreshToken: string,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const payload = this.jwtService.verify(refreshToken, {
-        secret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
+      const payload = this.jwtService.verify<JwtPayload>(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET ?? 'your-secret-key',
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const user = await this.usersService.findById(payload.sub);
 
       if (!user || !user.refreshToken) {
@@ -112,13 +115,13 @@ export class AuthService {
     const payload = { email, sub: userId };
 
     const accessToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      expiresIn: process.env.JWT_EXPIRATION || '15m',
+      secret: process.env.JWT_SECRET ?? 'your-secret-key',
+      expiresIn: process.env.JWT_EXPIRATION ?? '15m',
     });
 
     const refreshToken = this.jwtService.sign(payload, {
-      secret: process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-key',
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION || '7d',
+      secret: process.env.JWT_REFRESH_SECRET ?? 'your-refresh-secret-key',
+      expiresIn: process.env.JWT_REFRESH_EXPIRATION ?? '7d',
     });
 
     return {

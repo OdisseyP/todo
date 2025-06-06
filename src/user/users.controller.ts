@@ -76,8 +76,11 @@ export class UsersController {
     if (!user) {
       return null;
     }
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, refreshToken, ...userWithoutSensitiveData } = user;
+    const {
+      password: _password,
+      refreshToken: _refreshToken,
+      ...userWithoutSensitiveData
+    } = user;
     return userWithoutSensitiveData;
   }
 }
