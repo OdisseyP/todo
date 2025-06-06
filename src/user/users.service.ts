@@ -19,7 +19,9 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password' | 'refreshToken'>> {
+  async register(
+    dto: RegisterUserDto,
+  ): Promise<Omit<UserEntity, 'password' | 'refreshToken'>> {
     const existing = await this.userRepository.findOneBy({ email: dto.email });
 
     if (existing) {
@@ -69,13 +71,19 @@ export class UsersService {
     return this.userRepository.findOneBy({ id });
   }
 
-  async validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  async validatePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
-    await this.userRepository.update(userId, { 
-      refreshToken: refreshToken || undefined 
+  async updateRefreshToken(
+    userId: number,
+    refreshToken: string | null,
+  ): Promise<void> {
+    await this.userRepository.update(userId, {
+      refreshToken: refreshToken || undefined,
     });
   }
 }

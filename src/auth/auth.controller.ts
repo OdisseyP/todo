@@ -1,10 +1,4 @@
-import { 
-  Controller, 
-  Post, 
-  Body, 
-  HttpCode, 
-  HttpStatus 
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from 'src/user/users.service';
 import { RegisterUserDto } from 'src/task/dto/register-user.dto';
 import { UserEntity } from 'src/user/user.entity';
@@ -66,10 +60,10 @@ export class AuthController {
         refreshToken: {
           type: 'string',
           example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
-          description: 'Refresh token'
-        }
-      }
-    }
+          description: 'Refresh token',
+        },
+      },
+    },
   })
   @ApiResponse({
     status: 200,
@@ -78,15 +72,17 @@ export class AuthController {
       type: 'object',
       properties: {
         accessToken: { type: 'string' },
-        refreshToken: { type: 'string' }
-      }
-    }
+        refreshToken: { type: 'string' },
+      },
+    },
   })
   @ApiResponse({
     status: 401,
     description: 'Invalid refresh token',
   })
-  async refresh(@Body('refreshToken') refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> {
+  async refresh(
+    @Body('refreshToken') refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     return this.authService.refresh(refreshToken);
   }
 }
