@@ -25,4 +25,6 @@ export class UserEntity {
   @ApiProperty({ example: 'hashed_password', description: 'User password' })
   @Column()
   password: string;
+
+  refreshToken?: string;
 }

@@ -2,25 +2,32 @@ import {
   Injectable,
   ConflictException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserDto } from 'src/task/dto/register-user.dto';
+import { RegisterUserDto as CreateUserDto } from 'src/user/dto/register-user.dto';
 import { QueryFailedError } from 'typeorm';
-import { UserResponseDto } from 'src/task/dto/user-response-dto';
-import { instanceToInstance, plainToInstance } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
+import { UserInformationDto } from './dto/user-information.dto';
+import { SafeUser, SafeUserArray } from './user.types';
 
 @Injectable()
 export class UsersService {
+  updateRefreshToken(_userId: number, _refreshToken: any) {
+    throw new Error('Method not implemented.');
+  }
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: RegisterUserDto): Promise<Omit<UserEntity, 'password'>> {
-    const existing = await this.userRepository.findOneBy({ email: dto.email });
+  async register(dto: CreateUserDto): Promise<SafeUser> {
+    const existing = await this.userRepository.findOneBy({
+      email: dto.email,
+    });
 
     if (existing) {
       throw new ConflictException('User with this email already exists');
@@ -44,7 +51,7 @@ export class UsersService {
     try {
       const saved = await this.userRepository.save(user);
 
-      return plainToInstance(UserResponseDto, saved, {
+      return plainToInstance(UserInformationDto, saved, {
         excludeExtraneousValues: true,
       });
     } catch (err) {
@@ -59,5 +66,45 @@ export class UsersService {
 
       throw new InternalServerErrorException('Error creating user');
     }
+  }
+
+  async findByEmail(email: string): Promise<UserEntity | null> {
+    return this.userRepository.findOneBy({ email });
+  }
+
+  async findById(id: number): Promise<UserEntity | null> {
+    return this.userRepository.findOneBy({ id });
+  }
+
+  async getUserById(id: number): Promise<UserEntity> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User whith ID ${id} not found');
+    }
+    return user;
+  }
+
+  async validatePassword(
+    plainPassword: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
+
+  async findAllUsers(): Promise<SafeUserArray> {
+    return this.userRepository.find({
+      select: ['id', 'email', 'firstName', 'lastName'],
+    });
+  }
+
+  async getSafeUserById(id: number): Promise<SafeUser> {
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'email', 'firstName', 'lastName'],
+    });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return user;
   }
 }
