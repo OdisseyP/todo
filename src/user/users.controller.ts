@@ -37,6 +37,7 @@ export class UsersController {
     description: 'User successfully registered',
     type: RegisterResponseDto,
   })
+  
   @ApiResponse({ status: 409, description: 'User with this email already exists' })
   async register(@Body() createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
     return this.userService.createUser(createUserDto);
@@ -51,6 +52,7 @@ export class UsersController {
     description: 'List of all users',
     type: [UserListItemDto],
   })
+  
   async findAllUsers(): Promise<UserListItemDto[]> {
     return this.userService.findAllUsers();
   }
@@ -65,6 +67,7 @@ export class UsersController {
     type: UserListItemDto,
   })
   @ApiResponse({ status: 404, description: 'User not found' })
+  
   async getUserById(@Param('id') id: string): Promise<UserListItemDto> {
     return this.userService.getUserWithoutPasswordById(+id);
   }
@@ -76,6 +79,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User successfully deleted' })
   @ApiResponse({ status: 403, description: 'Forbidden - can only delete own account' })
   @ApiResponse({ status: 404, description: 'User not found' })
+  
   async deleteUser(
     @Param('id') id: string,
     @CurrentUser() currentUser: { userId: number },
@@ -97,11 +101,13 @@ export class UsersController {
   })
   @ApiResponse({ status: 403, description: 'Forbidden - can only update own account' })
   @ApiResponse({ status: 404, description: 'User not found' })
+
   async updateUser(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() currentUser: { userId: number },
   ): Promise<UserListItemDto> {
+
     if (currentUser.userId !== +id) {
       throw new ForbiddenException('You can only update your own account');
     }
