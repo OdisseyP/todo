@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 
 @Entity('users')
@@ -26,5 +26,9 @@ export class UserEntity {
   @Column()
   password: string;
 
-  refreshToken?: string;
+  @Column({ nullable: true })
+  refreshToken?: string | null;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

@@ -14,6 +14,7 @@ import { plainToInstance } from 'class-transformer';
 import { UserInformationDto } from './dto/user-information.dto';
 import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
 import { UserListItemDto } from './dto/user-list-item.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -36,6 +37,7 @@ export class UsersService {
     try {
       hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     } catch {
+      
       throw new InternalServerErrorException('Error hashing password');
     }
 
@@ -67,10 +69,12 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
+
     return this.userRepository.findOneBy({ email });
   }
 
   async findById(id: number): Promise<UserEntity | null> {
+
     return this.userRepository.findOneBy({ id });
   }
 
@@ -78,9 +82,9 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-
-      throw new NotFoundException('User whith ID ${id} not found');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
+
     return user;
   }
 
@@ -88,12 +92,16 @@ export class UsersService {
     plainPassword: string,
     hashedPassword: string,
   ): Promise<boolean> {
+
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
   async findAllUsers(): Promise<UserListItemDto[]> {
     return this.userRepository.find({
       select: ['id', 'email', 'firstName', 'lastName'],
+      order: {
+        id: 'DESC',
+      },
     });
   }
 
@@ -114,5 +122,35 @@ export class UsersService {
     await this.userRepository.update(userId, { 
       refreshToken: refreshToken || undefined 
     });
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    const result = await this.userRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UserListItemDto> {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    if (updateUserDto.email && updateUserDto.email !== user.email) {
+      const existing = await this.userRepository.findOneBy({
+        email: updateUserDto.email,
+      });
+      if (existing) {
+        throw new ConflictException('User with this email already exists');
+      }
+    }
+
+    if (updateUserDto.password) {
+      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+    }
+
+    await this.userRepository.update(id, updateUserDto);
+    return this.getUserWithoutPasswordById(id);
   }
 }
