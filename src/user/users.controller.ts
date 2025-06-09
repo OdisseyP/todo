@@ -59,11 +59,8 @@ export class UsersController {
     description: 'User found',
     type: UserListItemDto,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'User not found',
-  })
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserListItemDto> {
-    return this.userService.getSafeUserById(id);
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async getUserById(@Param('id') id: number): Promise<UserListItemDto> {
+    return this.userService.getUserWithoutPasswordById(id);
   }
 }

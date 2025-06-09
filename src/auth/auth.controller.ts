@@ -19,12 +19,12 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register a new user' })
+  @ApiOperation({ summary: 'Register new user' })
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
     status: 201,
-    type: RegisterResponseDto,
     description: 'User successfully registered',
+    type: RegisterResponseDto,
   })
   @ApiResponse({
     status: 409,

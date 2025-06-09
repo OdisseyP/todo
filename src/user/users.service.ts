@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from './user.entity';
 import * as bcrypt from 'bcrypt';
-import { RegisterUserDto as CreateUserDto } from 'src/user/dto/register-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { QueryFailedError } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { UserInformationDto } from './dto/user-information.dto';
@@ -99,18 +99,18 @@ export class UsersService {
     });
   }
 
-  async getSafeUserById(id: number): Promise<UserListItemDto> {
+  async getUserWithoutPasswordById(id: number): Promise<UserListItemDto> {
     const user = await this.userRepository.findOne({
       where: { id },
       select: ['id', 'email', 'firstName', 'lastName'],
     });
 
     if (!user) {
-
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
   }
+
   async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
     await this.userRepository.update(userId, { 
       refreshToken: refreshToken || undefined 
