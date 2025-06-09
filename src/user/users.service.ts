@@ -12,19 +12,17 @@ import { RegisterUserDto as CreateUserDto } from 'src/user/dto/register-user.dto
 import { QueryFailedError } from 'typeorm';
 import { plainToInstance } from 'class-transformer';
 import { UserInformationDto } from './dto/user-information.dto';
-import { SafeUser, SafeUserArray } from './user.types';
+import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
+import { UserListItemDto } from './dto/user-list-item.dto';
 
 @Injectable()
 export class UsersService {
-  updateRefreshToken(_userId: number, _refreshToken: any) {
-    throw new Error('Method not implemented.');
-  }
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: CreateUserDto): Promise<SafeUser> {
+  async register(dto: CreateUserDto): Promise<RegisterResponseDto> {
     const existing = await this.userRepository.findOneBy({
       email: dto.email,
     });
@@ -38,6 +36,7 @@ export class UsersService {
     try {
       hashedPassword = await bcrypt.hash(dto.password, 10);
     } catch {
+      
       throw new InternalServerErrorException('Error hashing password');
     }
 
@@ -51,10 +50,11 @@ export class UsersService {
     try {
       const saved = await this.userRepository.save(user);
 
-      return plainToInstance(UserInformationDto, saved, {
+      return plainToInstance(RegisterResponseDto, saved, {
         excludeExtraneousValues: true,
       });
     } catch (err) {
+
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;
@@ -78,7 +78,9 @@ export class UsersService {
 
   async getUserById(id: number): Promise<UserEntity> {
     const user = await this.userRepository.findOneBy({ id });
+
     if (!user) {
+
       throw new NotFoundException('User whith ID ${id} not found');
     }
     return user;
@@ -91,20 +93,27 @@ export class UsersService {
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
-  async findAllUsers(): Promise<SafeUserArray> {
+  async findAllUsers(): Promise<UserListItemDto[]> {
     return this.userRepository.find({
       select: ['id', 'email', 'firstName', 'lastName'],
     });
   }
 
-  async getSafeUserById(id: number): Promise<SafeUser> {
+  async getSafeUserById(id: number): Promise<UserListItemDto> {
     const user = await this.userRepository.findOne({
       where: { id },
       select: ['id', 'email', 'firstName', 'lastName'],
     });
+
     if (!user) {
+
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     return user;
+  }
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+    await this.userRepository.update(userId, { 
+      refreshToken: refreshToken || undefined 
+    });
   }
 }
