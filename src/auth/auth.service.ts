@@ -87,6 +87,7 @@ export class AuthService {
       if (error instanceof UnauthorizedException) {
         throw error;
       }
+
       throw new UnauthorizedException('Invalid refresh token');
     }
   }
