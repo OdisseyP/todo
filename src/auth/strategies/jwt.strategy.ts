@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config';
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     const secret = configService.get<string>('JWT_SECRET');
+
     if (!secret) {
       throw new Error('JWT_SECRET is not defined');
     }
@@ -19,6 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+
     return { userId: payload.sub, email: payload.email };
-  }
+  
+}
 } 
