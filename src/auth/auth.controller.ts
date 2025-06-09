@@ -7,7 +7,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { SafeUser } from 'src/user/user.types';
-import { type } from 'os';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { TokenResponseDto } from './dto/tokens-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -53,20 +54,18 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Refresh tokens' })
-  @ApiBody(type: )
-
+  @ApiBody({ type: RefreshTokenDto })
   @ApiResponse({
     status: 200,
     description: 'Successful token refresh',
-    @ApiBody({Refres})
   })
   @ApiResponse({
     status: 401,
     description: 'Invalid refresh token',
   })
   async refresh(
-    @Body('refreshToken') refreshToken: string,
-  ): Promise<{ accessToken: string, refreshToken: string }> {
-    return this.authService.refresh(refreshToken);
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<TokenResponseDto> {
+    return this.authService.refresh(refreshTokenDto.refreshToken);
   }
 }

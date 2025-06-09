@@ -60,11 +60,6 @@ export class UsersController {
   })
   @ApiResponse({
     status: 404,
-    description: 'User found',
-    type: UserEntity,
-  })
-  @ApiResponse({
-    status: 404,
     description: 'User not found',
   })
   async getUserById(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {

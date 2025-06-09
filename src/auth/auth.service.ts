@@ -5,9 +5,6 @@ import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import * as bcrypt from 'bcrypt';
 import { UserInformationDto } from '../user/dto/user-information.dto';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { UserEntity } from 'src/user/user.entity';
 import { JwtPayload } from './jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
@@ -17,9 +14,6 @@ export class AuthService {
     private usersService: UsersService,
     private jwtService: JwtService,
     private configService: ConfigService,
-
-    @InjectRepository(UserEntity)
-    private userRepository: Repository<UserEntity>,
   ) {}
 
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -100,7 +94,6 @@ export class AuthService {
   async logout(userId: number): Promise<void> {
     await this.updateRefreshToken(userId, null);
   }
-  // async updateRefreshToken(userId: number, refreshToken: string | null):
 
   private generateTokens(userId: number, email: string) {
     const payload = { email, sub: userId };
