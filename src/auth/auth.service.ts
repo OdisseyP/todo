@@ -7,9 +7,9 @@ import * as bcrypt from 'bcrypt';
 import { UserInformationDto } from '../user/dto/user-information.dto';
 import { JwtPayload } from './jwt-payload.interface';
 import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class AuthService {
-  [x: string]: any;
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
@@ -94,6 +94,10 @@ export class AuthService {
 
   async logout(userId: number): Promise<void> {
     await this.updateRefreshToken(userId, null);
+  }
+
+  async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+    await this.usersService.updateRefreshToken(userId, refreshToken);
   }
 
   private generateTokens(userId: number, email: string) {

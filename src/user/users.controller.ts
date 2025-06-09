@@ -12,7 +12,8 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from 'src/user/dto/register-user.dto';
 import { UserEntity } from './user.entity';
-import { SafeUser, SafeUserArray } from './user.types';
+import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
+import { UserListItemDto } from './dto/user-list-item.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -25,7 +26,7 @@ export class UsersController {
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
     status: 201,
-    type: UserEntity,
+    type: RegisterResponseDto,
     description: 'User successfully registered',
   })
   @ApiResponse({
@@ -34,7 +35,7 @@ export class UsersController {
   })
   async register(
     @Body() dto: RegisterUserDto,
-  ): Promise<Omit<UserEntity, 'password'>> {
+  ): Promise<RegisterResponseDto> {
     const user = this.userService.register(dto);
 
     return user;
@@ -45,9 +46,9 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'List of all users',
-    type: [UserEntity],
+    type: [UserListItemDto],
   })
-  async getAllUsers(): Promise<SafeUserArray> {
+  async getAllUsers(): Promise<UserListItemDto[]> {
     return this.userService.findAllUsers();
   }
 
@@ -56,13 +57,13 @@ export class UsersController {
   @ApiResponse({
     status: 200,
     description: 'User found',
-    type: UserEntity,
+    type: UserListItemDto,
   })
   @ApiResponse({
     status: 404,
     description: 'User not found',
   })
-  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<SafeUser> {
+  async getUserById(@Param('id', ParseIntPipe) id: number): Promise<UserListItemDto> {
     return this.userService.getSafeUserById(id);
   }
 }

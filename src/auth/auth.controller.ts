@@ -6,7 +6,7 @@ import { ApiBody, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
-import { SafeUser } from 'src/user/user.types';
+import { RegisterResponseDto } from './dto/register-response.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokenResponseDto } from './dto/tokens-response.dto';
 
@@ -23,14 +23,14 @@ export class AuthController {
   @ApiBody({ type: RegisterUserDto })
   @ApiResponse({
     status: 201,
-    type: UserEntity,
+    type: RegisterResponseDto,
     description: 'User successfully registered',
   })
   @ApiResponse({
     status: 409,
     description: 'User with this email already exists',
   })
-  async register(@Body() registerUserDto: RegisterUserDto): Promise<SafeUser> {
+  async register(@Body() registerUserDto: RegisterUserDto): Promise<RegisterResponseDto> {
     return this.usersService.register(registerUserDto);
   }
 
