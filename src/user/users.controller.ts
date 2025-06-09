@@ -14,6 +14,7 @@ import { RegisterUserDto } from 'src/user/dto/register-user.dto';
 import { UserEntity } from './user.entity';
 import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
 import { UserListItemDto } from './dto/user-list-item.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -22,23 +23,16 @@ export class UsersController {
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Register a new user' })
-  @ApiBody({ type: RegisterUserDto })
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
-    type: RegisterResponseDto,
     description: 'User successfully registered',
+    type: RegisterResponseDto,
   })
-  @ApiResponse({
-    status: 409,
-    description: 'User with this email already exists',
-  })
-  async register(
-    @Body() dto: RegisterUserDto,
-  ): Promise<RegisterResponseDto> {
-    const user = this.userService.register(dto);
-
-    return user;
+  @ApiResponse({ status: 409, description: 'User with this email already exists' })
+  async register(@Body() createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
+    return this.userService.createUser(createUserDto);
   }
 
   @Get()

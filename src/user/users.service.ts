@@ -22,9 +22,9 @@ export class UsersService {
     private readonly userRepository: Repository<UserEntity>,
   ) {}
 
-  async register(dto: CreateUserDto): Promise<RegisterResponseDto> {
+  async createUser(createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
     const existing = await this.userRepository.findOneBy({
-      email: dto.email,
+      email: createUserDto.email,
     });
 
     if (existing) {
@@ -34,16 +34,15 @@ export class UsersService {
     let hashedPassword: string;
 
     try {
-      hashedPassword = await bcrypt.hash(dto.password, 10);
+      hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     } catch {
-      
       throw new InternalServerErrorException('Error hashing password');
     }
 
     const user = this.userRepository.create({
-      email: dto.email,
-      firstName: dto.firstName,
-      lastName: dto.lastName,
+      email: createUserDto.email,
+      firstName: createUserDto.firstName,
+      lastName: createUserDto.lastName,
       password: hashedPassword,
     });
 
@@ -54,7 +53,6 @@ export class UsersService {
         excludeExtraneousValues: true,
       });
     } catch (err) {
-
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;

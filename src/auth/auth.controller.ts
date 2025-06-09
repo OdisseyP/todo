@@ -9,6 +9,7 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { RegisterResponseDto } from './dto/register-response.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokenResponseDto } from './dto/tokens-response.dto';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -20,7 +21,7 @@ export class AuthController {
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register new user' })
-  @ApiBody({ type: RegisterUserDto })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
     description: 'User successfully registered',
@@ -30,8 +31,8 @@ export class AuthController {
     status: 409,
     description: 'User with this email already exists',
   })
-  async register(@Body() registerUserDto: RegisterUserDto): Promise<RegisterResponseDto> {
-    return this.usersService.register(registerUserDto);
+  async register(@Body() createUserDto: CreateUserDto): Promise<RegisterResponseDto> {
+    return this.usersService.createUser(createUserDto);
   }
 
   @Post('login')
