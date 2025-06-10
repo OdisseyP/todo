@@ -3,6 +3,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +15,8 @@ import { plainToInstance } from 'class-transformer';
 import { UserInformationDto } from './dto/user-information.dto';
 import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
 import { UserListItemDto } from './dto/user-list-item.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UserWithoutPassword } from './user.types';
 
 @Injectable()
 export class UsersService {
@@ -61,7 +64,6 @@ export class UsersService {
           throw new ConflictException('User with this email already exists');
         }
       }
-
       throw new InternalServerErrorException('Error creating user');
     }
   }
@@ -78,9 +80,9 @@ export class UsersService {
     const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
-
-      throw new NotFoundException('User whith ID ${id} not found');
+      throw new NotFoundException(`User with ID ${id} not found`);
     }
+
     return user;
   }
 
@@ -94,6 +96,9 @@ export class UsersService {
   async findAllUsers(): Promise<UserListItemDto[]> {
     return this.userRepository.find({
       select: ['id', 'email', 'firstName', 'lastName'],
+      order: {
+        id: 'DESC',
+      },
     });
   }
 
@@ -114,5 +119,43 @@ export class UsersService {
     await this.userRepository.update(userId, { 
       refreshToken: refreshToken || undefined 
     });
+  }
+
+  async deleteUser(id: number, currentUserId: number): Promise<void> {
+
+    if (currentUserId !== id) {
+      throw new ForbiddenException('You can only delete your own account');
+    }
+
+    const user = await this.findById(id);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.userRepository.delete(id);
+  }
+
+  async updateUser(id: number, updateUserDto: UpdateUserDto, currentUserId: number): Promise<UserListItemDto> {
+
+    if (currentUserId !== id) {
+      throw new ForbiddenException('You can only update your own account');
+    }
+
+    const user = await this.findById(id);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (updateUserDto.email) {
+      const existingUser = await this.findByEmail(updateUserDto.email);
+      if (existingUser && existingUser.id !== id) {
+        throw new ConflictException('Email already exists');
+      }
+    }
+
+    await this.userRepository.update(id, updateUserDto);
+
+    return this.getUserWithoutPasswordById(id);
   }
 }
