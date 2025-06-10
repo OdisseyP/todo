@@ -3,6 +3,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,6 +16,7 @@ import { UserInformationDto } from './dto/user-information.dto';
 import { RegisterResponseDto } from 'src/auth/dto/register-response.dto';
 import { UserListItemDto } from './dto/user-list-item.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserWithoutPassword } from './user.types';
 
 @Injectable()
 export class UsersService {
@@ -64,7 +66,6 @@ export class UsersService {
           throw new ConflictException('User with this email already exists');
         }
       }
-
       throw new InternalServerErrorException('Error creating user');
     }
   }
@@ -93,7 +94,6 @@ export class UsersService {
     plainPassword: string,
     hashedPassword: string,
   ): Promise<boolean> {
-
     return bcrypt.compare(plainPassword, hashedPassword);
   }
 
@@ -125,33 +125,41 @@ export class UsersService {
     });
   }
 
-  async deleteUser(id: number): Promise<void> {
-    const result = await this.userRepository.delete(id);
+  async deleteUser(id: number, currentUserId: number): Promise<void> {
 
-    if (result.affected === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    if (currentUserId !== id) {
+      throw new ForbiddenException('You can only delete your own account');
     }
+
+    const user = await this.findById(id);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    await this.userRepository.delete(id);
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UserListItemDto> {
-    const user = await this.userRepository.findOneBy({ id });
+  async updateUser(id: number, updateUserDto: UpdateUserDto, currentUserId: number): Promise<UserListItemDto> {
 
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+    if (currentUserId !== id) {
+      throw new ForbiddenException('You can only update your own account');
     }
 
-    if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existing = await this.userRepository.findOneBy({
-        email: updateUserDto.email,
-      });
-      
-      if (existing) {
-        throw new ConflictException('User with this email already exists');
+    const user = await this.findById(id);
+    
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    if (updateUserDto.email) {
+      const existingUser = await this.findByEmail(updateUserDto.email);
+      if (existingUser && existingUser.id !== id) {
+        throw new ConflictException('Email already exists');
       }
     }
 
     await this.userRepository.update(id, updateUserDto);
-
+    
     return this.getUserWithoutPasswordById(id);
   }
 }
