@@ -79,12 +79,12 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User successfully deleted' })
   @ApiResponse({ status: 403, description: 'Forbidden - can only delete own account' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  
   async deleteUser(
     @Param('id') id: string,
     @CurrentUser() currentUser: { userId: number },
   ): Promise<void> {
     if (currentUser.userId !== +id) {
+      
       throw new ForbiddenException('You can only delete your own account');
     }
     await this.userService.deleteUser(+id);

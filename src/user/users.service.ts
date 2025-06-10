@@ -55,6 +55,7 @@ export class UsersService {
         excludeExtraneousValues: true,
       });
     } catch (err) {
+
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;
@@ -126,6 +127,7 @@ export class UsersService {
 
   async deleteUser(id: number): Promise<void> {
     const result = await this.userRepository.delete(id);
+
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -133,6 +135,7 @@ export class UsersService {
 
   async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<UserListItemDto> {
     const user = await this.userRepository.findOneBy({ id });
+
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
@@ -141,16 +144,14 @@ export class UsersService {
       const existing = await this.userRepository.findOneBy({
         email: updateUserDto.email,
       });
+      
       if (existing) {
         throw new ConflictException('User with this email already exists');
       }
     }
 
-    if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
-    }
-
     await this.userRepository.update(id, updateUserDto);
+
     return this.getUserWithoutPasswordById(id);
   }
 }
