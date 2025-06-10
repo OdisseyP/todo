@@ -29,16 +29,16 @@ export class TaskService {
   }
 
   async findOne(id: number): Promise<TaskEntity> {
-    const findTask = await this.taskRepository.findOne({
+    const foundTask = await this.taskRepository.findOne({
       where: { id },
       relations: ['creator'],
     });
 
-    if (!findTask) {
+    if (!foundTask) {
       throw new NotFoundException(`Task with id ${id} not found`);
     }
 
-    return findTask;
+    return foundTask;
   }
 
   async create(dto: CreateTaskDto, creatorId: number): Promise<TaskEntity> {
@@ -73,6 +73,7 @@ export class TaskService {
     }
 
     await this.taskRepository.delete(id);
+
     return true;
   }
 
@@ -84,6 +85,7 @@ export class TaskService {
     }
 
     task.status = status;
+
     return this.taskRepository.save(task);
   }
 }
