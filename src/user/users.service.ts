@@ -56,7 +56,6 @@ export class UsersService {
         excludeExtraneousValues: true,
       });
     } catch (err) {
-
       if (err instanceof QueryFailedError) {
         const drv = err.driverError as Record<string, unknown>;
         const code = drv?.code as string | undefined;
@@ -70,12 +69,10 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<UserEntity | null> {
-
     return this.userRepository.findOneBy({ email });
   }
 
   async findById(id: number): Promise<UserEntity | null> {
-
     return this.userRepository.findOneBy({ id });
   }
 
