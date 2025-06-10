@@ -26,8 +26,8 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @Column({ nullable: true })
-  refreshToken?: string | null;
+  @Column({ type: 'text', nullable: true })
+  refreshToken: string | null;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -9,12 +9,15 @@ import {
   Post,
   HttpCode,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { CreateTaskDto } from './dto/create-task-dto';
 import { UpdateTaskDto } from './dto/update-task-dto';
 import { TaskEntity } from './task.entity';
 import { ChangeStatusDto } from './dto/change-status-dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 import {
   ApiTags,
@@ -22,11 +25,14 @@ import {
   ApiResponse,
   ApiParam,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TaskStatus } from './task-status';
 
 @ApiTags('tasks')
 @Controller('tasks')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
@@ -50,8 +56,11 @@ export class TaskController {
   @ApiOperation({ summary: 'Create task' })
   @ApiBody({ type: CreateTaskDto })
   @ApiResponse({ status: 201, type: TaskEntity })
-  create(@Body() CreateTaskDto: CreateTaskDto): Promise<TaskEntity> {
-    return this.taskService.create(CreateTaskDto);
+  create(
+    @Body() CreateTaskDto: CreateTaskDto,
+    @CurrentUser() currentUser: { userId: number },
+  ): Promise<TaskEntity> {
+    return this.taskService.create(CreateTaskDto, currentUser.userId);
   }
 
   @Patch(':id')
@@ -60,11 +69,13 @@ export class TaskController {
   @ApiBody({ type: UpdateTaskDto })
   @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - not your task' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() UpdateTaskDto: UpdateTaskDto,
+    @CurrentUser() currentUser: { userId: number },
   ): Promise<TaskEntity> {
-    return this.taskService.update(id, UpdateTaskDto);
+    return this.taskService.update(id, UpdateTaskDto, currentUser.userId);
   }
 
   @Patch(':id/status')
@@ -73,11 +84,13 @@ export class TaskController {
   @ApiBody({ type: ChangeStatusDto })
   @ApiResponse({ status: 200, type: TaskEntity })
   @ApiResponse({ status: 404, description: 'Task not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - not your task' })
   async changeStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() ChangeStatusDto: ChangeStatusDto,
+    @CurrentUser() currentUser: { userId: number },
   ): Promise<TaskEntity> {
-    return this.taskService.changeStatus(id, ChangeStatusDto.status);
+    return this.taskService.changeStatus(id, ChangeStatusDto.status, currentUser.userId);
   }
 
   @Delete(':id')
@@ -85,8 +98,12 @@ export class TaskController {
   @ApiParam({ name: 'id', example: 1 })
   @ApiResponse({ status: 204, description: 'Deleted' })
   @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - not your task' })
   @HttpCode(204)
-  remove(@Param('id', ParseIntPipe) id: number): Promise<boolean> {
-    return this.taskService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() currentUser: { userId: number },
+  ): Promise<boolean> {
+    return this.taskService.remove(id, currentUser.userId);
   }
 }
