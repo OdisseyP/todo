@@ -39,7 +39,6 @@ export class UsersService {
     try {
       hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     } catch {
-      
       throw new InternalServerErrorException('Error hashing password');
     }
 
@@ -159,7 +158,7 @@ export class UsersService {
     }
 
     await this.userRepository.update(id, updateUserDto);
-    
+
     return this.getUserWithoutPasswordById(id);
   }
 }
