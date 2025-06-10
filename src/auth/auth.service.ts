@@ -95,7 +95,6 @@ export class AuthService {
   async logout(userId: number): Promise<void> {
     await this.updateRefreshToken(userId, null);
   }
-
   async updateRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
     await this.usersService.updateRefreshToken(userId, refreshToken);
   }
